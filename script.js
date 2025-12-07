@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (CaptureButton) {
         CaptureButton.innerHTML = "Open<br>Camera";
         CaptureButton.style.zIndex = '10';
-        // Hide button by default (not on Capture tab)
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
     }
 
     // Create video container
@@ -62,23 +59,26 @@ function showHome() {
         resultsBox.style.display = 'none';
     }
     
-    // Hide and disable capture button
-    CaptureButton.style.display = 'none';
-    CaptureButton.disabled = true;
-    
     document.getElementById('homeSection').style.display = 'block';
+        // Hide and disable capture button
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
 }
+        // Hide and disable capture button
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
 
 function showCapture() {
     console.log("Navigating to Capture");
     hideAllSections();
-    
-    // Show and enable capture button
-    CaptureButton.style.display = 'block';
-    CaptureButton.disabled = false;
-    
     document.getElementById('captureSection').style.display = 'block';
+        // Show and enable capture button
+        CaptureButton.style.display = 'block';
+        CaptureButton.disabled = false;
 }
+        // Show and enable capture button
+        CaptureButton.style.display = 'block';
+        CaptureButton.disabled = false;
 
 function showGallery() {
     console.log("Navigating to Gallery");
@@ -95,12 +95,14 @@ function showGallery() {
         resultsBox.style.display = 'none';
     }
     
-    // Hide and disable capture button
-    CaptureButton.style.display = 'none';
-    CaptureButton.disabled = true;
-    
     document.getElementById('gallerySection').style.display = 'block';
+        // Hide and disable capture button
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
 }
+        // Hide and disable capture button
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
 
 function showAnalytics() {
     console.log("Navigating to Analytics");
@@ -117,12 +119,14 @@ function showAnalytics() {
         resultsBox.style.display = 'none';
     }
     
-    // Hide and disable capture button
-    CaptureButton.style.display = 'none';
-    CaptureButton.disabled = true;
-    
     document.getElementById('analyticsSection').style.display = 'block';
+        // Hide and disable capture button
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
 }
+        // Hide and disable capture button
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
 
 // ============================================
 // Camera & Photo Capture
