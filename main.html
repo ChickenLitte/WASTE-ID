@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="UTF-8">
-<title>WasteID</title>
+<title>Racoon</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="main.css">
 <style>
@@ -9,26 +9,41 @@
 <body class = "body">
 
 <div class = "header">
-<h1>WasteID, an intuitive waste management/tracker designed for buisness</h1>
+    <img src="" alt="Racoon Logo" class="header-logo">
+    <h1>Racoon, an intuitive waste management/tracker designed for buisness</h1>
 </div>
 
 <nav class="navigation">
     <button class="nav-btn" onclick="showHome()">Home</button>
     <button class="nav-btn" onclick="showCapture()">Capture</button>
-    <button class="nav-btn" onclick="showGallery()">Gallery</button>
-    <button class="nav-btn" onclick="showAnalytics()">Analytics</button>
+    <button class="nav-btn" onclick="Stats()">Analytics</button>
 </nav>
 
-<div class="presentation">
-<!-- Just the main info about why WasteID exists and what it does -->
+<div id="homeSection" class="section" style="display: block;">
+    <div class="companyWhy" id="companyWhy">
+        <p1>Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development. Its purpose is to permit a page layout to be designed, independently of the copy that will subsequently populate it, or to demonstrate various fonts of a typeface without meaningful text that could be distracting.</p1>
+    </div>
+    <img src="websiteImagery/OIP.jpeg" class = "binImage"">
 </div>
 
-<!-- and now, actual implementation-->
-<div class = "instructions">
-    <p3> Take photo or insert image file below</p3>
+<div id="captureSection" class="section" style="display: none;">
+    <div class="instructions">
+        <p3>Take photo or insert image file below</p3>
+    </div>
+    <button id="CaptureBTN" class="photo" onclick="clicked()">Open<br>Camera</button>
 </div>
 
-<button id = "CaptureBTN" class = "photo" onclick="clicked()">Open<br>Camera</button>
+<div id="gallerySection" class="section" style="display: none;">
+    <div class="instructions">
+        <p3>Gallery - Your saved photos will appear here</p3>
+    </div>
+</div>
+
+<div id="analyticsSection" class="section" style="display: none;">
+    <div class="instructions">
+        <p3>Analytics - Waste tracking statistics</p3>
+    </div>
+</div>
 
 <script src="script.js"></script>
 </body>

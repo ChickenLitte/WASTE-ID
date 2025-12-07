@@ -22,6 +22,39 @@ if (!videoContainer) {
 // Style the button for positioning
 CaptureButton.style.zIndex = '10';
 
+// Function to hide all sections
+function hideAllSections() {
+    document.getElementById('homeSection').style.display = 'none';
+    document.getElementById('captureSection').style.display = 'none';
+    document.getElementById('gallerySection').style.display = 'none';
+    document.getElementById('analyticsSection').style.display = 'none';
+}
+
+// Navigation functions
+function showHome() {
+    console.log("Navigating to Home");
+    hideAllSections();
+    document.getElementById('homeSection').style.display = 'block';
+}
+
+function showCapture() {
+    console.log("Navigating to Capture");
+    hideAllSections();
+    document.getElementById('captureSection').style.display = 'block';
+}
+
+function showGallery() {
+    console.log("Navigating to Gallery");
+    hideAllSections();
+    document.getElementById('gallerySection').style.display = 'block';
+}
+
+function showAnalytics() {
+    console.log("Navigating to Analytics");
+    hideAllSections();
+    document.getElementById('analyticsSection').style.display = 'block';
+}
+
 function clicked() {
     if (!isVideoActive) {
         startVideo();
