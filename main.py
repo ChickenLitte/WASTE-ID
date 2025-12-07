@@ -229,7 +229,6 @@ def train_model():
     torch.save(model.state_dict(), "trash_model.pth")
     print("Model saved to trash_model.pth")
 
-train_model()
 
 # Testing
 
