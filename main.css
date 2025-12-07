@@ -138,6 +138,21 @@ photo:hover {
     transform: scale(1.05);
 }
 
+.resultsBox {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: rgb(250, 70, 85);
+    border-radius: 8px;
+    color: white;
+    min-height: 100px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 photo:active {
     transform: scale(0.98);
 }

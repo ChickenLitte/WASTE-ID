@@ -2,25 +2,31 @@ let isVideoActive = false;
 let stream = null;
 let video = null;
 let canvas = null;
+let classificationResult = null;
+let CaptureButton = null;
+let videoContainer = null;
 
-const CaptureButton = document.getElementById('CaptureBTN');
-CaptureButton.innerHTML = "Open<br>Camera";
+// Initialize after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    CaptureButton = document.getElementById('CaptureBTN');
+    if (CaptureButton) {
+        CaptureButton.innerHTML = "Open<br>Camera";
+        CaptureButton.style.zIndex = '10';
+    }
 
-// Create a container for the video if it doesn't exist
-let videoContainer = document.getElementById('videoContainer');
-if (!videoContainer) {
-    videoContainer = document.createElement('div');
-    videoContainer.id = 'videoContainer';
-    videoContainer.style.display = 'none';
-    videoContainer.style.position = 'relative';
-    videoContainer.style.margin = '80px auto';
-    videoContainer.style.width = 'fit-content';
-    videoContainer.style.zIndex = '1000';
-    document.body.appendChild(videoContainer);
-}
-
-// Style the button for positioning
-CaptureButton.style.zIndex = '10';
+    // Create a container for the video if it doesn't exist
+    videoContainer = document.getElementById('videoContainer');
+    if (!videoContainer) {
+        videoContainer = document.createElement('div');
+        videoContainer.id = 'videoContainer';
+        videoContainer.style.display = 'none';
+        videoContainer.style.position = 'relative';
+        videoContainer.style.margin = '80px auto';
+        videoContainer.style.width = 'fit-content';
+        videoContainer.style.zIndex = '1000';
+        document.body.appendChild(videoContainer);
+    }
+});
 
 // Function to hide all sections
 function hideAllSections() {
@@ -120,23 +126,88 @@ function takePhoto() {
 }
 
 function savePhoto(blob) {
-    // Create object URL for the blob
-    const url = URL.createObjectURL(blob);
+    // Send the blob to the AI image analysis API
+    classifyImage(blob);
+}
+
+async function classifyImage(blob) {
+    try {
+        // Create FormData to send the image
+        const formData = new FormData();
+        formData.append("file", blob, `photo_${Date.now()}.jpg`);
+
+        // Send to your AI API endpoint
+        const response = await fetch("http://localhost:8000/predict", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        classificationResult = data;
+        
+        console.log("Classification result:", data);
+        
+        // Display the result in the results box
+        appendResultToBox(data);
+        
+        // Optionally save the image after classification
+        // downloadPhoto(blob);
+    } catch (err) {
+        console.error("Error calling classification API:", err);
+        appendResultToBox({ error: `Error: ${err.message}` });
+    }
+}
+
+function appendResultToBox(result) {
+    const resultsBox = document.getElementById('resultsBox');
+    if (!resultsBox) return;
+
+    // Show the results box if it's hidden
+    if (resultsBox.style.display === 'none') {
+        resultsBox.style.display = 'block';
+        
+        // Position it below the video container if it's visible
+        if (videoContainer && videoContainer.style.display === 'block') {
+            resultsBox.style.marginTop = '20px';
+            videoContainer.appendChild(resultsBox);
+        }
+    }
+
+    // Create a result entry
+    const timestamp = new Date().toLocaleTimeString();
+    let resultHTML = `<div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.3);">`;
+    resultHTML += `<strong>[${timestamp}]</strong><br>`;
     
-    // Create a download link
+    if (result.error) {
+        resultHTML += `<span style="color: #ffcccc;">${result.error}</span>`;
+    } else {
+        const confidencePercent = (result.confidence * 100).toFixed(1);
+        resultHTML += `<strong>Category:</strong> ${result.class_name}<br>`;
+        resultHTML += `<strong>Confidence:</strong> ${confidencePercent}%`;
+    }
+    
+    resultHTML += `</div>`;
+    
+    // Append to results box
+    resultsBox.innerHTML += resultHTML;
+}
+
+function downloadPhoto(blob) {
+    // Optional: download the photo along with classification
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `photo_${Date.now()}.jpg`;
     
-    // Trigger download
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     
-    // Clean up the object URL
     URL.revokeObjectURL(url);
-    
-    console.log("Photo saved:", a.download);
 }
 
 function stopVideo() {
@@ -154,5 +225,12 @@ function stopVideo() {
         
         document.body.appendChild(CaptureButton);
         CaptureButton.innerHTML = "Open<br>Camera";
+        
+        // Move results box back to capture section if it exists
+        const resultsBox = document.getElementById('resultsBox');
+        const captureSection = document.getElementById('captureSection');
+        if (resultsBox && captureSection && resultsBox.style.display === 'block') {
+            captureSection.appendChild(resultsBox);
+        }
     }
 }
