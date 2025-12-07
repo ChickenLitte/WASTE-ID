@@ -12,7 +12,7 @@ import random
 import shutil
 from tqdm import tqdm
 import torch
-
+from PIL import Image
 
 path = Path(
     kagglehub.dataset_download("alistairking/recyclable-and-household-waste-classification")
@@ -99,7 +99,7 @@ print(len(os.listdir(train_dir / some_class)))
 
 
 
-class PlayingCardDataset(Dataset):
+class TrashDataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.dataset = ImageFolder(root=root_dir, transform=transform)
     def __len__(self):
@@ -110,7 +110,7 @@ class PlayingCardDataset(Dataset):
     def classes(self):
         return self.dataset.classes
 
-dataset = PlayingCardDataset(root_dir=
+dataset = TrashDataset(root_dir=
                              train_dir,
                              )
 print(len(dataset))
@@ -123,7 +123,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-dataset = PlayingCardDataset(root_dir=train_dir, transform=transform)
+dataset = TrashDataset(root_dir=train_dir, transform=transform)
 
 image, label = dataset[100]
 print(image.shape)
@@ -133,9 +133,9 @@ for images, labels in dataloader:
   break
 print(images.shape, labels.shape)
 
-class SimpleCardClassifier(nn.Module):
+class SimpleTrashClassifier(nn.Module):
   def __init__(self, num_classes=30):
-    super(SimpleCardClassifier, self).__init__()
+    super(SimpleTrashClassifier, self).__init__()
     # Where we define all the parts of the model
     self.base_model = timm.create_model('efficientnet_b0', pretrained=True)
     self.features = nn.Sequential(*list(self.base_model.children())[:-1])
@@ -151,7 +151,7 @@ class SimpleCardClassifier(nn.Module):
     output = self.classifier(x)
     return output
 
-model = SimpleCardClassifier(num_classes=30)
+model = SimpleTrashClassifier(num_classes=30)
 
 
 example_out = model(images)
@@ -171,9 +171,9 @@ transform = transforms.Compose([
 
 val_path = os.path.join(path,'valid')
 
-train_dataset = PlayingCardDataset(root_dir=train_dir, transform=transform)
-val_dataset = PlayingCardDataset(root_dir=valid_dir, transform=transform)
-test_dataset = PlayingCardDataset(root_dir=test_dir, transform=transform)
+train_dataset = TrashDataset(root_dir=train_dir, transform=transform)
+val_dataset = TrashDataset(root_dir=valid_dir, transform=transform)
+test_dataset = TrashDataset(root_dir=test_dir, transform=transform)
 
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False)
@@ -184,40 +184,79 @@ train_losses, val_losses = [], []
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = SimpleCardClassifier(num_classes=53)
+model = SimpleTrashClassifier(num_classes=53)
 model.to(device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-for epoch in range(num_epoch):
-  # Set the model to train
-  model.train()
-  running_loss = 0.0
-  for images, labels in tqdm(train_dataloader,desc='training loop'):
-    images, labels = images.to(device), labels.to(device)
+def train_model():
+    for epoch in range(num_epoch):
+        # --- Training phase ---
+        model.train()
+        running_loss = 0.0
+        for images, labels in tqdm(train_dataloader, desc='training loop'):
+            images, labels = images.to(device), labels.to(device)
 
-    optimizer.zero_grad()
-    outputs = model(images)
-    loss = criterion(outputs, labels)
-    loss.backward()
-    optimizer.step()
-    running_loss += loss.item() * labels.size(0)
-  train_loss = running_loss / len(train_dataloader.dataset)
-  train_losses.append(train_loss)
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item() * labels.size(0)
 
-  # Validation phase
-  model.eval()
-  running_loss = 0.0
-  with torch.no_grad():
-    for images, labels in tqdm(val_dataloader,desc='Validation loop'):
-      images, labels = images.to(device), labels.to(device)
-      outputs = model(images)
-      loss = criterion(outputs, labels)
-      running_loss += loss.item() * labels.size(0)
-  val_loss = running_loss / len(val_dataloader.dataset)
-  val_losses.append(val_loss)
+        train_loss = running_loss / len(train_dataloader.dataset)
+        train_losses.append(train_loss)
 
-  # Print epoch stats
-  print(f"Epoch {epoch+1}/{num_epoch} - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}")
+        # --- Validation phase ---
+        model.eval()
+        running_loss = 0.0
+        with torch.no_grad():
+            for images, labels in tqdm(val_dataloader, desc='Validation loop'):
+                images, labels = images.to(device), labels.to(device)
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                running_loss += loss.item() * labels.size(0)
 
+        val_loss = running_loss / len(val_dataloader.dataset)
+        val_losses.append(val_loss)
+
+        # Print epoch stats
+        print(f"Epoch {epoch+1}/{num_epoch} - "
+              f"Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}")
+
+    # ✅ Save once after all epochs
+    torch.save(model.state_dict(), "trash_model.pth")
+    print("Model saved to trash_model.pth")
+
+train_model()
+
+# Testing
+
+
+# Predict using the model
+def predict(model, image_tensor, device):
+    model.eval()
+    with torch.no_grad():
+        image_tensor = image_tensor.to(device)
+        outputs = model(image_tensor)
+        probabilities = torch.nn.functional.softmax(outputs, dim=1)
+    return probabilities.cpu().numpy().flatten()
+
+torch.save(model.state_dict(), "trash_model.pth")
+
+# Load and preprocess the image
+def preprocess_image(image_path, transform):
+    image = Image.open(image_path).convert("RGB")
+    return image, transform(image).unsqueeze(0)
+test_image = "websiteImagery/download (6).jpeg"
+transform = transforms.Compose([
+    transforms.Resize((128, 128)),
+    transforms.ToTensor()
+])
+
+original_image, image_tensor = preprocess_image(test_image, transform)
+probabilities = predict(model, image_tensor, device)
+
+# Assuming dataset.classes gives the class names
+class_names = dataset.classes
