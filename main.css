@@ -1,22 +1,58 @@
+/* ============================================
+   CSS Variables - Semantic by Section/Type
+   ============================================ */
+:root {
+    /* Header Section */
+    --header-bg: rgb(237,209,142);
+    --header-text: black;
+    
+    /* Navigation Section */
+    --nav-bg: rgb(250, 70, 85);
+    --nav-btn-bg: rgb(1, 159, 70);
+    --nav-btn-text: white;
+    --nav-btn-hover-bg: rgb(174,237,142);
+    --nav-btn-hover-text: black;
+    
+    /* Page Background */
+    --page-bg: rgb(174,237,142);
+    
+    /* Content Sections (Instructions, Analytics, Company Info) */
+    --content-bg: rgb(250, 70, 85);
+    --content-text: white;
+    
+    /* Buttons */
+    --button-bg: rgb(1, 159, 70);
+    --button-text: white;
+    --button-hover-bg: rgb(174,237,142);
+    --button-hover-text: black;
+    
+    /* Results Box */
+    --results-bg: rgb(250, 70, 85);
+    --results-text: white;
+    
+    /* Spacing */
+    --spacing-small: 10px;
+    --spacing-medium: 20px;
+    --spacing-large: 30px;
+    
+    /* Other */
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
 .body {
-    background-color: rgb(174,237,142);
+    background-color: var(--page-bg);
     overflow-y: auto;
     height: 100%;
     margin: 0;
 }
-.companyWhy {
-    text-align: center;
-    font-size: 20px;
-    margin-top: 10px;
-    background-color: rgb(250, 70, 85);
-    position: relative;
-    left: 0%;
-    border-radius: 8px;
-    color: white;
-}
+
+/* ============================================
+   Header & Navigation
+   ============================================ */
 .header {
-    color: black;
-    background-color: rgb(237,209,142);
+    color: var(--header-text);
+    background-color: var(--header-bg);
     width: 100%;
     height: 80px;
     padding: 10px 15px;
@@ -46,8 +82,87 @@
     font-size: 18px;
     line-height: 1.2;
     white-space: normal;
+    color: var(--header-text);
 }
 
+.navigation {
+    width: 100%;
+    background-color: var(--nav-bg);
+    padding: 10px 0px;
+    text-align: center;
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+.nav-btn {
+    display: inline-block;
+    margin: 10px 50px;
+    padding: 12px 25px;
+    background-color: var(--nav-btn-bg);
+    color: var(--nav-btn-text);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.nav-btn:hover {
+    background-color: var(--nav-btn-hover-bg);
+    color: var(--nav-btn-hover-text);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Content Sections
+   ============================================ */
+.instructions {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--content-bg);
+    color: var(--content-text);
+    border-radius: var(--border-radius);
+}
+
+.companyWhy {
+    text-align: center;
+    font-size: 18px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--content-bg);
+    color: var(--content-text);
+    border-radius: var(--border-radius);
+    max-width: 700px;
+}
+
+.companyWhy p1 {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.analyticsContent {
+    text-align: center;
+    font-size: 16px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--content-bg);
+    color: var(--content-text);
+    border-radius: var(--border-radius);
+    line-height: 1.6;
+    max-width: 700px;
+}
+
+/* ============================================
+   Images
+   ============================================ */
 .imagesContainer {
     display: flex;
     justify-content: flex-start;
@@ -63,87 +178,50 @@
     height: auto;
     border-radius: 0px;
     object-fit: cover;
+    display: block;
 }
 
 .binImage:nth-child(2) {
     width: 20%;
 }
 
-/* Navigation styling */
-.navigation {
-    width: 100%;
-    background-color: rgb(250, 70, 85);
-    padding: 10px 0px;
-    text-align: center;
-    margin: 0px;
-    box-sizing: border-box;
-}
-
-.nav-btn {
-    display: inline-block;
-    margin: 10px 50px;
-    padding: 12px 25px;
-    background-color: rgb(1, 159, 70);
-    color: black;
-    border: 0px solid rgb(174,237,142);
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.nav-btn:hover {
-    background-color: rgb(174,237,142);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.nav-btn:active {
-    transform: translateY(0);
-}
-.binImage{
-    display: block;
-    margin: 0px auto;
-    width: 700px;
-    height: auto;
-    float:right;
-}
-.instructions {
-    text-align: center;
-    font-size: 18px;
-    margin-top: 20px;
-    background-color: rgb(250, 70, 85);
-}
-
-/* Capture button styling */
+/* ============================================
+   Buttons
+   ============================================ */
 .photo {
-    display:block;
-    margin: 100px auto;
+    display: block;
+    margin: 20px auto;
     padding: 35px 30px;
-    background-color: rgb(237,209,142);
-    color: black;
+    background-color: var(--button-bg);
+    color: var(--button-text);
     border: none;
     border-radius: 100px;
     font-size: 15px;
-    text-wrap-style:pretty;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
-photo:hover {
-    background-color: rgb(220, 190, 120);
+.photo:hover {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);
 }
 
+.photo:active {
+    transform: scale(0.98);
+}
+
+/* ============================================
+   Results Box
+   ============================================ */
 .resultsBox {
     margin-top: 30px;
     padding: 20px;
-    background-color: rgb(250, 70, 85);
-    border-radius: 8px;
-    color: white;
+    background-color: var(--results-bg);
+    border-radius: var(--border-radius);
+    color: var(--results-text);
     min-height: 100px;
     text-align: left;
     font-size: 16px;
@@ -151,10 +229,6 @@ photo:hover {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-}
-
-photo:active {
-    transform: scale(0.98);
 }
 
 .analyticsContent {
