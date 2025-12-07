@@ -141,3 +141,17 @@ photo:hover {
 photo:active {
     transform: scale(0.98);
 }
+
+.analyticsContent {
+    text-align: center;
+    font-size: 16px;
+    margin: 20px 15px;
+    padding: 20px;
+    background-color: rgb(250, 70, 85);
+    border-radius: 8px;
+    color: white;
+    line-height: 1.6;
+}
+.analyticsSection .instructions p {
+    color: white;
+}
