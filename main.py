@@ -13,15 +13,69 @@ from torchvision.datasets import ImageFolder
 import kagglehub
 import timm
 import os 
+from pathlib import Path
+import random
+import shutil
 # Download latest version
 
 
-path = kagglehub.dataset_download("alistairking/recyclable-and-household-waste-classification")
+dataset_root = Path(
+    kagglehub.dataset_download("alistairking/recyclable-and-household-waste-classification")
+    )
 
-print("Path to dataset files:", path)
-app = FastAPI()
+# print("Dataset root:", dataset_root)
+# print("At root level:", os.listdir(dataset_root))   # ← should be ['images']
 
-print(os.listdir(path))
+# images_dir = os.path.join(dataset_root, "images")
+# print("Images dir:", images_dir)
+# images_dir2 = os.path.join(images_dir,'images')
+# print("Inside images:", os.listdir(images_dir2))  
+
+train_ratio = 0.8
+
+images_dir = dataset_root / "images"
+root = dataset_root
+train_dir = root / "train"
+test_dir = root / "test"
+train_dir.mkdir(exist_ok=True)
+test_dir.mkdir(exist_ok=True)
+
+random.seed(42)
+
+for class_dir in images_dir.iterdir():
+    if not class_dir.is_dir():
+        continue
+
+    class_name = class_dir.name
+    print(f"Processing class: {class_name}")
+
+    # Collect all images in default/ and real_world/ (or any subfolder)
+    all_images = []
+    for subdir in class_dir.iterdir():
+        if subdir.is_dir():
+            all_images.extend(subdir.glob("*.*"))  # png, jpg, etc.
+
+    all_images = [p for p in all_images if p.is_file()]
+    random.shuffle(all_images)
+
+    split_idx = int(len(all_images) * train_ratio)
+    train_images = all_images[:split_idx]
+    test_images = all_images[split_idx:]
+
+    # Create class subfolders in train/ and test/
+    (train_dir / class_name).mkdir(parents=True, exist_ok=True)
+    (test_dir / class_name).mkdir(parents=True, exist_ok=True)
+
+    # Move or copy images
+    for img_path in train_images:
+        dest = train_dir / class_name / img_path.name
+        shutil.copy2(img_path, dest)  # or shutil.move if you want to move
+
+    for img_path in test_images:
+        dest = test_dir / class_name / img_path.name
+        shutil.copy2(img_path, dest)  # or shutil.move
+
+print("Done splitting into train/ and test/.")
 # train_path = os.path.join(path, 'train')
 # test_path = os.path.join(path, 'test')
 
