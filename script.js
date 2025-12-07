@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (CaptureButton) {
         CaptureButton.innerHTML = "Open<br>Camera";
         CaptureButton.style.zIndex = '10';
+        // Hide button by default (not on Capture tab)
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
     }
 
     // Create video container
@@ -59,26 +62,23 @@ function showHome() {
         resultsBox.style.display = 'none';
     }
     
+    // Hide and disable capture button
+    CaptureButton.style.display = 'none';
+    CaptureButton.disabled = true;
+    
     document.getElementById('homeSection').style.display = 'block';
-        // Hide and disable capture button
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
 }
-        // Hide and disable capture button
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
 
 function showCapture() {
     console.log("Navigating to Capture");
     hideAllSections();
+    
+    // Show and enable capture button
+    CaptureButton.style.display = 'block';
+    CaptureButton.disabled = false;
+    
     document.getElementById('captureSection').style.display = 'block';
-        // Show and enable capture button
-        CaptureButton.style.display = 'block';
-        CaptureButton.disabled = false;
 }
-        // Show and enable capture button
-        CaptureButton.style.display = 'block';
-        CaptureButton.disabled = false;
 
 function showGallery() {
     console.log("Navigating to Gallery");
@@ -95,14 +95,12 @@ function showGallery() {
         resultsBox.style.display = 'none';
     }
     
+    // Hide and disable capture button
+    CaptureButton.style.display = 'none';
+    CaptureButton.disabled = true;
+    
     document.getElementById('gallerySection').style.display = 'block';
-        // Hide and disable capture button
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
 }
-        // Hide and disable capture button
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
 
 function showAnalytics() {
     console.log("Navigating to Analytics");
@@ -119,14 +117,12 @@ function showAnalytics() {
         resultsBox.style.display = 'none';
     }
     
+    // Hide and disable capture button
+    CaptureButton.style.display = 'none';
+    CaptureButton.disabled = true;
+    
     document.getElementById('analyticsSection').style.display = 'block';
-        // Hide and disable capture button
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
 }
-        // Hide and disable capture button
-        CaptureButton.style.display = 'none';
-        CaptureButton.disabled = true;
 
 // ============================================
 // Camera & Photo Capture
@@ -232,6 +228,71 @@ function stopVideo() {
 }
 
 // ============================================
+// Waste Bin Categorization
+// ============================================
+function getWasteBinCategory(className) {
+    // Categorize waste items into bins: Recycling, Compost, Trash
+    const recyclables = [
+        'aerosol_cans',
+        'aluminum_food_cans',
+        'aluminum_soda_cans',
+        'cardboard_boxes',
+        'cardboard_packaging',
+        'glass_beverage_bottles',
+        'glass_cosmetic_containers',
+        'glass_food_jars',
+        'magazines',
+        'newspaper',
+        'office_paper',
+        'paper_cups',
+        'plastic_cup_lids',
+        'plastic_detergent_bottles',
+        'plastic_food_containers',
+        'plastic_shopping_bags',
+        'plastic_soda_bottles',
+        'plastic_straws',
+        'plastic_trash_bags',
+        'plastic_water_bottles',
+        'steel_food_cans'
+    ];
+
+    const compostables = [
+        'coffee_grounds',
+        'eggshells',
+        'food_waste',
+        'tea_bags'
+    ];
+
+    const trash = [
+        'clothing',
+        'disposable_plastic_cutlery',
+        'shoes',
+        'styrofoam_cups',
+        'styrofoam_food_containers'
+    ];
+
+    if (recyclables.includes(className)) {
+        return {
+            bin: '♻️ Recycling Bin',
+            binColor: '#4CAF50',
+            description: 'This item can be recycled'
+        };
+    } else if (compostables.includes(className)) {
+        return {
+            bin: '🌱 Compost Bin',
+            binColor: '#8B4513',
+            description: 'This item can be composted'
+        };
+    } else {
+        return {
+            bin: '🗑️ Trash Bin',
+            binColor: '#f44336',
+            description: 'This item goes to trash'
+        };
+    }
+}
+
+// ============================================
 // AI Image Classification
 // ============================================
 async function classifyImage(blob) {
@@ -241,7 +302,7 @@ async function classifyImage(blob) {
         formData.append("file", blob, `photo_${Date.now()}.jpg`);
 
         // Send to classification API
-        const response = await fetch("http://localhost:8000/predict", {
+        const response = await fetch("https://supreme-robot-q7qg7jjxg4jw3xj7-8000.app.github.dev/", {
             method: "POST",
             body: formData,
         });
@@ -254,7 +315,11 @@ async function classifyImage(blob) {
         classificationResult = data;
         
         console.log("Classification result:", data);
-        appendResultToBox(data);
+        
+        // Get waste bin categorization
+        const binCategory = getWasteBinCategory(data.class_name);
+        
+        appendResultToBox(data, binCategory);
         
     } catch (err) {
         console.error("Error calling classification API:", err);
@@ -265,7 +330,7 @@ async function classifyImage(blob) {
 // ============================================
 // Results Display
 // ============================================
-function appendResultToBox(result) {
+function appendResultToBox(result, binCategory) {
     const resultsBox = document.getElementById('resultsBox');
     if (!resultsBox) return;
 
@@ -289,8 +354,16 @@ function appendResultToBox(result) {
         resultHTML += `<span style="color: #ffcccc;">${result.error}</span>`;
     } else {
         const confidencePercent = (result.confidence * 100).toFixed(1);
-        resultHTML += `<strong>Category:</strong> ${result.class_name}<br>`;
-        resultHTML += `<strong>Confidence:</strong> ${confidencePercent}%`;
+        resultHTML += `<strong>Item:</strong> ${result.class_name}<br>`;
+        resultHTML += `<strong>Confidence:</strong> ${confidencePercent}%<br>`;
+        
+        // Display bin categorization
+        if (binCategory) {
+            resultHTML += `<div style="margin-top: 8px; padding: 8px; background-color: ${binCategory.binColor}40; border-left: 4px solid ${binCategory.binColor}; border-radius: 4px;">`;
+            resultHTML += `<strong style="color: ${binCategory.binColor};">${binCategory.bin}</strong><br>`;
+            resultHTML += `<span style="font-size: 0.9em; color: #333;">${binCategory.description}</span>`;
+            resultHTML += `</div>`;
+        }
     }
     
     resultHTML += `</div>`;
@@ -312,3 +385,4 @@ function downloadPhoto(blob) {
     
     URL.revokeObjectURL(url);
 }
+
