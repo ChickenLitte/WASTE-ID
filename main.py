@@ -1,22 +1,17 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
-import cv2
-from PIL import Image
-import numpy as np
-import pandas as pd
+
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
-# Download latest version
 import kagglehub
 import timm
 import os 
 from pathlib import Path
 import random
 import shutil
-# Download latest version
+from tqdm import tqdm
+import torch
 
 
 path = Path(
@@ -183,6 +178,46 @@ test_dataset = PlayingCardDataset(root_dir=test_dir, transform=transform)
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-# @app.post("/predict/")
-# async def create_upload_file(file: UploadFile = File(...)):
-#     return JSONResponse(content={"filename": file.filename})
+
+num_epoch = 5
+train_losses, val_losses = [], []
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model = SimpleCardClassifier(num_classes=53)
+model.to(device)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(num_epoch):
+  # Set the model to train
+  model.train()
+  running_loss = 0.0
+  for images, labels in tqdm(train_dataloader,desc='training loop'):
+    images, labels = images.to(device), labels.to(device)
+
+    optimizer.zero_grad()
+    outputs = model(images)
+    loss = criterion(outputs, labels)
+    loss.backward()
+    optimizer.step()
+    running_loss += loss.item() * labels.size(0)
+  train_loss = running_loss / len(train_dataloader.dataset)
+  train_losses.append(train_loss)
+
+  # Validation phase
+  model.eval()
+  running_loss = 0.0
+  with torch.no_grad():
+    for images, labels in tqdm(val_dataloader,desc='Validation loop'):
+      images, labels = images.to(device), labels.to(device)
+      outputs = model(images)
+      loss = criterion(outputs, labels)
+      running_loss += loss.item() * labels.size(0)
+  val_loss = running_loss / len(val_dataloader.dataset)
+  val_losses.append(val_loss)
+
+  # Print epoch stats
+  print(f"Epoch {epoch+1}/{num_epoch} - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}")
+
