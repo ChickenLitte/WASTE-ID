@@ -9,6 +9,9 @@ let classificationResult = null;
 let CaptureButton = null;
 let videoContainer = null;
 
+// 🔑 Backend API base URL (FastAPI on localhost:8000)
+const API_URL = "http://localhost:8000";
+
 // ============================================
 // DOM Initialization
 // ============================================
@@ -63,8 +66,10 @@ function showHome() {
     }
     
     // Hide and disable capture button
-    CaptureButton.style.display = 'none';
-    CaptureButton.disabled = true;
+    if (CaptureButton) {
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
+    }
     
     document.getElementById('homeSection').style.display = 'block';
 }
@@ -74,8 +79,10 @@ function showCapture() {
     hideAllSections();
     
     // Show and enable capture button
-    CaptureButton.style.display = 'block';
-    CaptureButton.disabled = false;
+    if (CaptureButton) {
+        CaptureButton.style.display = 'block';
+        CaptureButton.disabled = false;
+    }
     
     document.getElementById('captureSection').style.display = 'block';
 }
@@ -96,8 +103,10 @@ function showGallery() {
     }
     
     // Hide and disable capture button
-    CaptureButton.style.display = 'none';
-    CaptureButton.disabled = true;
+    if (CaptureButton) {
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
+    }
     
     document.getElementById('gallerySection').style.display = 'block';
 }
@@ -118,8 +127,10 @@ function showAnalytics() {
     }
     
     // Hide and disable capture button
-    CaptureButton.style.display = 'none';
-    CaptureButton.disabled = true;
+    if (CaptureButton) {
+        CaptureButton.style.display = 'none';
+        CaptureButton.disabled = true;
+    }
     
     document.getElementById('analyticsSection').style.display = 'block';
 }
@@ -301,8 +312,8 @@ async function classifyImage(blob) {
         const formData = new FormData();
         formData.append("file", blob, `photo_${Date.now()}.jpg`);
 
-        // Send to classification API
-        const response = await fetch("https://supreme-robot-q7qg7jjxg4jw3xj7-8000.app.github.dev/docs#/default/predict_predict_post", {
+        // ✅ Call FastAPI backend on localhost:8000 /predict
+        const response = await fetch(`${API_URL}/predict`, {
             method: "POST",
             body: formData,
         });
