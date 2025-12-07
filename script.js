@@ -302,7 +302,7 @@ async function classifyImage(blob) {
         formData.append("file", blob, `photo_${Date.now()}.jpg`);
 
         // Send to classification API
-        const response = await fetch("https://supreme-robot-q7qg7jjxg4jw3xj7-8000.app.github.dev/", {
+        const response = await fetch("https://supreme-robot-q7qg7jjxg4jw3xj7-8000.app.github.dev/docs#/default/predict_predict_post", {
             method: "POST",
             body: formData,
         });

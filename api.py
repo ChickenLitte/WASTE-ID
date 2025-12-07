@@ -11,11 +11,18 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 import timm
+from fastapi.middleware.cors import CORSMiddleware
 
-# ---------------------------
-# 1) Create FastAPI app
-# ---------------------------
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # or ["http://localhost:3000", "…"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 app.add_middleware(
     CORSMiddleware,
