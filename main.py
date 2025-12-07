@@ -19,7 +19,7 @@ import shutil
 # Download latest version
 
 
-dataset_root = Path(
+path = Path(
     kagglehub.dataset_download("alistairking/recyclable-and-household-waste-classification")
     )
 
@@ -31,6 +31,7 @@ dataset_root = Path(
 # images_dir2 = os.path.join(images_dir,'images')
 # print("Inside images:", os.listdir(images_dir2))  
 
+dataset_root = Path(os.path.join(path,'images'))
 train_ratio = 0.8
 
 images_dir = dataset_root / "images"
@@ -49,13 +50,14 @@ for class_dir in images_dir.iterdir():
     class_name = class_dir.name
     print(f"Processing class: {class_name}")
 
-    # Collect all images in default/ and real_world/ (or any subfolder)
-    all_images = []
-    for subdir in class_dir.iterdir():
-        if subdir.is_dir():
-            all_images.extend(subdir.glob("*.*"))  # png, jpg, etc.
+    # Get ALL image files under this class folder (including default/ and real_world/)
+    all_images = [p for p in class_dir.rglob("*") if p.is_file()]
+    print(f"{class_name}: found {len(all_images)} images")
 
-    all_images = [p for p in all_images if p.is_file()]
+    if not all_images:
+        # Just in case something is wrong with this class, skip it
+        continue
+
     random.shuffle(all_images)
 
     split_idx = int(len(all_images) * train_ratio)
@@ -66,16 +68,24 @@ for class_dir in images_dir.iterdir():
     (train_dir / class_name).mkdir(parents=True, exist_ok=True)
     (test_dir / class_name).mkdir(parents=True, exist_ok=True)
 
-    # Move or copy images
+    # Copy images into train/<class_name>/ and test/<class_name>/
     for img_path in train_images:
         dest = train_dir / class_name / img_path.name
-        shutil.copy2(img_path, dest)  # or shutil.move if you want to move
+        shutil.copy2(img_path, dest)
 
     for img_path in test_images:
         dest = test_dir / class_name / img_path.name
-        shutil.copy2(img_path, dest)  # or shutil.move
+        shutil.copy2(img_path, dest)
 
 print("Done splitting into train/ and test/.")
+
+some_class = os.listdir(train_dir)[0]
+print("Example class:", some_class)
+print("Train files in that class:", os.listdir(train_dir / some_class))
+print(len(os.listdir(train_dir / some_class)))
+
+
+
 # train_path = os.path.join(path, 'train')
 # test_path = os.path.join(path, 'test')
 
