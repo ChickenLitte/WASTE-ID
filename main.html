@@ -6,12 +6,18 @@
 <link rel="stylesheet" href="main.css">
 <style>
 </style>
-<script src="script.js"></script>
 <body class = "body">
 
 <div class = "header">
 <h1>WasteID, an intuitive waste management/tracker designed for buisness</h1>
 </div>
+
+<nav class="navigation">
+    <button class="nav-btn" onclick="showHome()">Home</button>
+    <button class="nav-btn" onclick="showCapture()">Capture</button>
+    <button class="nav-btn" onclick="showGallery()">Gallery</button>
+    <button class="nav-btn" onclick="showAnalytics()">Analytics</button>
+</nav>
 
 <div class="presentation">
 <!-- Just the main info about why WasteID exists and what it does -->
@@ -22,7 +28,8 @@
     <p3> Take photo or insert image file below</p3>
 </div>
 
-<input class = "photo" type="button" value="Open Camera" onclick="TakePhoto();">
+<button id = "CaptureBTN" class = "photo" onclick="clicked()">Open<br>Camera</button>
 
+<script src="script.js"></script>
 </body>
 </html>
