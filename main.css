@@ -1,0 +1,13 @@
+.body {
+    background-color: rgb(174,237,142)
+}
+.header {
+    color: black;
+    background-color: rgb(237,209,142);
+    width:auto;
+    height: 40px;
+    padding: 0px;
+    border-radius: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
